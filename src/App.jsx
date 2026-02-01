@@ -1,3 +1,4 @@
+import UserTicketInput from "./components/UserTicketInput";
 import { saveTicket } from "./db";
 import { useState } from "react";
 import Disclaimer from "./components/Disclaimer";
@@ -33,6 +34,7 @@ function App() {
       <button onClick={generateNumbers} disabled={loading}>
         {loading ? "Running simulation…" : "Generate Numbers"}
       </button>
+      <UserTicketInput />
 
       {result.length > 0 && (
         <div style={{ marginTop: "1rem", fontSize: "1.3rem" }}>

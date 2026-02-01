@@ -1,3 +1,4 @@
+import { saveTicket } from "./db";
 import { useState } from "react";
 import Disclaimer from "./components/Disclaimer";
 import { useLotteryWorker } from "./hooks/useLotteryWorker";
@@ -12,16 +13,17 @@ function App() {
     setLoading(true);
 
     runSimulation(
-      {
-        simulations: 50000,
-        maxNumber: 60,
-        picks: 6,
-      },
-      (data) => {
-        setResult(data);
-        setLoading(false);
-      }
-    );
+  {
+    simulations: 50000,
+    maxNumber: 60,
+    picks: 6,
+  },
+  async (data) => {
+    setResult(data);
+    await saveTicket(data, "generated");
+    setLoading(false);
+  }
+);
   };
 
   return (

@@ -6,8 +6,7 @@ export function useLotteryWorker() {
   const runSimulation = (params, callback) => {
     if (!workerRef.current) {
       workerRef.current = new Worker(
-        new URL("../workers/lotteryWorker.js", import.meta.url),
-        { type: "module" }
+       new URL("../workers/lotteryWorker.js", import.meta.url)
       );
     }
 

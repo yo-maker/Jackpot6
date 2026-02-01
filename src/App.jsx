@@ -32,13 +32,11 @@ function App() {
         {loading ? "Running simulation…" : "Generate Numbers"}
       </button>
 
-      <ul style={{ marginTop: "1rem" }}>
-        {result.map((n) => (
-          <li key={n.num}>
-            {n.num} (score: {n.count})
-          </li>
-        ))}
-      </ul>
+      {result.length > 0 && (
+        <div style={{ marginTop: "1rem", fontSize: "1.3rem" }}>
+          {result.map(n => n.num).join(" – ")}
+        </div>
+      )}
 
       <Disclaimer />
     </div>

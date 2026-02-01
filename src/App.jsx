@@ -1,8 +1,6 @@
-import UserTicketInput from "./components/UserTicketInput";
-import { saveTicket } from "./db";
-import { useState } from "react";
-import Disclaimer from "./components/Disclaimer";
 import { useLotteryWorker } from "./hooks/useLotteryWorker";
+import UserTicketInput from "./components/UserTicketInput";
+import Disclaimer from "./components/Disclaimer";
 
 function App() {
   const [result, setResult] = useState([]);

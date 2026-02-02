@@ -1,14 +1,18 @@
 const DB_NAME = "jackpot6-db";
-const STORE = "tickets";
+const DB_VERSION = 1;
+const STORE_NAME = "tickets";
 
 function openDB() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onupgradeneeded = () => {
       const db = request.result;
-      if (!db.objectStoreNames.contains(STORE)) {
-        db.createObjectStore(STORE, { autoIncrement: true });
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, {
+          keyPath: "id",
+          autoIncrement: true,
+        });
       }
     };
 
@@ -17,24 +21,19 @@ function openDB() {
   });
 }
 
-export async function saveTicket(type, numbers) {
+export async function saveTicket(numbers) {
   const db = await openDB();
-  const tx = db.transaction(STORE, "readwrite");
-  const store = tx.objectStore(STORE);
-
-  store.add({
-    type, // "generated" | "user"
+  const tx = db.transaction(STORE_NAME, "readwrite");
+  tx.objectStore(STORE_NAME).add({
     numbers,
-    date: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   });
-
-  return tx.complete;
 }
 
 export async function getTickets() {
   const db = await openDB();
-  const tx = db.transaction(STORE, "readonly");
-  const store = tx.objectStore(STORE);
+  const tx = db.transaction(STORE_NAME, "readonly");
+  const store = tx.objectStore(STORE_NAME);
 
   return new Promise((resolve) => {
     const request = store.getAll();

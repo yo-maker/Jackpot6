@@ -1,65 +1,52 @@
-import { useState } from "react";
-import { saveTicket } from "./db";
+import { useEffect, useState } from "react";
 import { useLotteryWorker } from "./hooks/useLotteryWorker";
+import { getTickets } from "./db/db";
 import UserTicketInput from "./components/UserTicketInput";
+import TicketHistory from "./components/TicketHistory";
 import Disclaimer from "./components/Disclaimer";
 
-function App() {
-  const [result, setResult] = useState([]);
-  const [userTicket, setUserTicket] = useState([]);
+export default function App() {
+  const [generated, setGenerated] = useState([]);
+  const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const { runSimulation } = useLotteryWorker();
 
-  const generateNumbers = () => {
-    setLoading(true);
+  const loadTickets = async () => {
+    const all = await getTickets();
+    setTickets(all);
+  };
 
+  useEffect(() => {
+    loadTickets();
+  }, []);
+
+  const generate = () => {
+    setLoading(true);
     runSimulation(
-      {
-        simulations: 50000,
-        maxNumber: 60,
-        picks: 6,
-      },
-      async (data) => {
-        setResult(data.map((d) => d.number));
-        await saveTicket("generated", data.map((d) => d.number));
+      { simulations: 50000, maxNumber: 60, picks: 6 },
+      (data) => {
+        setGenerated(data);
         setLoading(false);
       }
     );
   };
 
-  const matches = userTicket.filter((n) => result.includes(n));
-
   return (
-    <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <h1>Jackpot 6 🎰</h1>
+    <div style={{ padding: "1rem", maxWidth: "480px", margin: "auto" }}>
+      <h1>Jackpot 6</h1>
 
-      <button onClick={generateNumbers} disabled={loading}>
-        {loading ? "Running simulation…" : "Generate Numbers"}
+      <button onClick={generate} disabled={loading}>
+        {loading ? "Calculating..." : "Generate Numbers"}
       </button>
 
-      {result.length > 0 && (
-        <>
-          <h2>Generated Numbers</h2>
-          <p>{result.join(", ")}</p>
-        </>
+      {generated.length > 0 && (
+        <h2>Generated: {generated.join(", ")}</h2>
       )}
 
-      <UserTicketInput onSave={setUserTicket} />
-
-      {userTicket.length > 0 && (
-        <>
-          <h2>Your Numbers</h2>
-          <p>{userTicket.join(", ")}</p>
-
-          <h3>Matches 🎯</h3>
-          <p>{matches.length > 0 ? matches.join(", ") : "No matches yet"}</p>
-        </>
-      )}
-
+      <UserTicketInput onSaved={loadTickets} />
+      <TicketHistory tickets={tickets} generated={generated} />
       <Disclaimer />
     </div>
   );
 }
-
-export default App;
